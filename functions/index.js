@@ -1,3 +1,4 @@
+"use strict";
 var functions = require('firebase-functions');
 let admin = require('firebase-admin');
 
@@ -22,15 +23,14 @@ exports.dappUp = functions.database.ref('/requests/{pushId}').onWrite(event => {
 
 exports.sendChat = functions.database.ref('/chats/{chatId}/messages/{msgId}').onWrite(event => {
     let message = event.data.val();
-
+    
     return loadUser(message.to).then(user => {
         let token = user.push_token;
         let payload = {
             data: {
                 sender_name: message.sender_name,
                 text: message.text,
-                type: 'chat',
-                conversationKey: message.parent().parent().name()
+                type: 'chat'
             }
         };
         return admin.messaging().sendToDevice(token, payload);
