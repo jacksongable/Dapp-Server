@@ -4,16 +4,15 @@ let admin = require('firebase-admin');
 
 admin.initializeApp(functions.config().firebase);
 
-exports.dappUp = functions.database.ref('/requests/{pushId}').onWrite(event => {
-    let req = event.data.val();
+exports.dappUp = functions.database.ref('/notifications/{userUid}/{primaryKey}').onWrite(event => {
+    let notif = event.data.val();
 
-    return loadUser(req.to).then(user => {
+    return loadUser(event.params.userUid).then(user => {
         let token = user.push_token;
         let payload = {
           data: {
-              fromName: req.fromName,
-              fromId: req.from,
-              gid: user.group,
+              msg: notif.message,
+              from_group: notif.meta.from_group,
               type: 'request'
             }
         };
